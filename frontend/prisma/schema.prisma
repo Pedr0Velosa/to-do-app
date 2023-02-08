@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  relationMode      = "prisma"
+}
+
+model Task {
+  id       String  @id @default(uuid())
+  title    String
+  done     Boolean
+  to_do_Id String
+  to_do    To_do   @relation(fields: [to_do_Id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([to_do_Id])
+}
+
+model To_do {
+  id          String   @id @default(uuid())
+  title       String
+  status      String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  tasks       Task[]
+  user_Id     String
+  user        User     @relation(fields: [user_Id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([user_Id])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  To_do     To_do[]
+}
