@@ -13,6 +13,7 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import EmailInput from "./EmailInput";
 import PasswordInput from "./PasswordInput";
+import NextLink from "next/link";
 import { METHODS } from "@/utils/Methods";
 
 const theme = createTheme();
@@ -160,9 +161,11 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
+                <NextLink href={"/signup"} passHref legacyBehavior>
+                  <Link variant="body2">
+                    {"Don't have an account? Sign Up"}
+                  </Link>
+                </NextLink>
               </Grid>
             </Grid>
           </Box>

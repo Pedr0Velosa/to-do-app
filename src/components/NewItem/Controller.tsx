@@ -25,7 +25,7 @@ const NewItemController = () => {
       });
       return;
     }
-    await axios("/api/todo", { method: METHODS.UPDATE, data: { title } })
+    await axios("/api/todo", { method: METHODS.CREATE, data: { title } })
       .then((res) => res.data)
       .catch((err) => {
         if (err.response.data.error) {
