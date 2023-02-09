@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-import Link from "@mui/material/Link";
+import Link from "@/components/Link/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -13,7 +13,6 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import EmailInput from "./EmailInput";
 import PasswordInput from "./PasswordInput";
-import NextLink from "next/link";
 import { METHODS } from "@/utils/Methods";
 
 const theme = createTheme();
@@ -161,11 +160,7 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item>
-                <NextLink href={"/signup"} passHref legacyBehavior>
-                  <Link variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
-                </NextLink>
+                <Link href={"/signup"}>{"Don't have an account? Sign Up"}</Link>
               </Grid>
             </Grid>
           </Box>
