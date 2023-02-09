@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next int",
+    "server": "concurrently --kill-others \"npm run server:main\" \"npm run server:shadow\" \"npm run server:prisma\"",
     "server:main": "pscale connect to-do-app main --port 3309",
     "server:shadow": "pscale connect to-do-app shadow --port 3310",
     "server:prisma": "npx prisma studio"
@@ -19,10 +20,12 @@
     "@mui/styled-engine-sc": "^5.11.0",
     "@next/font": "13.1.6",
     "@prisma/client": "^4.10.0",
+    "@types/cookie": "^0.5.1",
     "@types/node": "18.13.0",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
     "axios": "^1.3.2",
+    "bcrypt": "^5.1.0",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
     "next": "13.1.6",
@@ -37,6 +40,8 @@
     "typescript": "4.9.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "concurrently": "^7.6.0",
     "prisma": "^4.10.0"
   }
 }
