@@ -39,9 +39,12 @@ export default function SignUp() {
       firstName: "",
       lastName: "",
       password: "",
+      email: "",
       "confirmed-password": "",
     },
   });
+
+  const onSubmit = (data: ISignUpForm) => console.log(data);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -60,7 +63,12 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <Box component="form" noValidate sx={{ mt: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          sx={{ mt: 3 }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <FirstNameController control={control} />
