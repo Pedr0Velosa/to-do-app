@@ -1,4 +1,6 @@
 import Header from "@/components/Header/Hearder";
+import NewItemController from "@/components/NewItem/Controller";
+import { Box, Container } from "@mui/system";
 import Head from "next/head";
 
 export default function Home() {
@@ -11,6 +13,17 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
+      <Container>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <NewItemController />
+        </Box>
+      </Container>
     </>
   );
 }
