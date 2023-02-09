@@ -9,7 +9,7 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import axios from "axios";
 import addNotification from "@libs/toast/addNotification";
 import { Typography } from "@mui/material";
-import type { IFormValues } from "./Controller";
+import type { INewItemForm } from "./Controller";
 import type {
   ControllerRenderProps,
   FieldErrors,
@@ -19,43 +19,13 @@ import type {
 } from "react-hook-form";
 
 type InputProps = {
-  field: ControllerRenderProps<IFormValues, "title">;
-  handleSubmit: UseFormHandleSubmit<IFormValues>;
-  errors: FieldErrors<IFormValues>;
-  setError: UseFormSetError<IFormValues>;
-  setValue: UseFormSetValue<IFormValues>;
+  field: ControllerRenderProps<INewItemForm, "title">;
+  handleSubmit: UseFormHandleSubmit<INewItemForm>;
+  errors: FieldErrors<INewItemForm>;
+  onClick: (data: INewItemForm) => void;
 };
 
-const Input = ({
-  field,
-  handleSubmit,
-  errors,
-  setError,
-  setValue,
-}: InputProps) => {
-  async function createToDo(title: string) {
-    if (!title) {
-      setError("title", {
-        type: "custom",
-        message: "To do must have a title!",
-      });
-      return;
-    }
-    await axios
-      .post("/api/todo/create", { title })
-      .then((res) => res.data)
-      .catch((err) => {
-        if (err.response.data.error) {
-          addNotification({ title: "Failed to create To do", type: "error" });
-        }
-      });
-    setValue("title", "");
-    addNotification({ title: "Failed to create To do", type: "success" });
-  }
-  function onClick(data: IFormValues) {
-    const { title } = data;
-    createToDo(title);
-  }
+const Input = ({ field, handleSubmit, errors, onClick }: InputProps) => {
   return (
     <Box sx={{ mt: 6, maxWidth: "60ch", width: "100%" }}>
       <FormControl variant="filled" fullWidth>
