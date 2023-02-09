@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next int",
+    "lint": "next lint",
     "server": "concurrently --kill-others \"npm run server:main\" \"npm run server:shadow\" \"npm run server:prisma\"",
     "server:main": "pscale connect to-do-app main --port 3309",
     "server:shadow": "pscale connect to-do-app shadow --port 3310",

@@ -1,9 +1,10 @@
 import Header from "@/components/Header/Hearder";
 import NewItemController from "@/components/NewItem/Controller";
 import { Box, Container } from "@mui/system";
+import { NextPage } from "next";
 import Head from "next/head";
 
-export default function Home() {
+const HomePage: NextPage = (): JSX.Element => {
   return (
     <>
       <Head>
@@ -26,4 +27,5 @@ export default function Home() {
       </Container>
     </>
   );
-}
+};
+export default HomePage;
