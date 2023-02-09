@@ -9,11 +9,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import axios from "axios";
-import EmailInput from "./EmailInput";
-import PasswordInput from "./PasswordInput";
 import { METHODS } from "@/utils/Methods";
+import EmailController from "./Controllers/EmailController";
+import PasswordController from "./Controllers/PasswordController";
 
 const theme = createTheme();
 
@@ -114,42 +114,8 @@ export default function SignIn() {
             noValidate
             sx={{ mt: 1 }}
           >
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <EmailInput field={field} />
-                  {errors.email && (
-                    <Typography
-                      color={"error"}
-                      component={"span"}
-                      variant="subtitle1"
-                    >
-                      {errors.email.message}
-                    </Typography>
-                  )}
-                </>
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <PasswordInput field={field} />
-                  {errors.password && (
-                    <Typography
-                      color={"error"}
-                      component={"span"}
-                      variant="subtitle1"
-                    >
-                      {errors.password.message}
-                    </Typography>
-                  )}
-                </>
-              )}
-            />
+            <EmailController control={control} />
+            <PasswordController control={control} />
             <Button
               type="submit"
               fullWidth
