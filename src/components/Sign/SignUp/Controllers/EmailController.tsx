@@ -3,15 +3,17 @@ import React from "react";
 import { Control, Controller } from "react-hook-form";
 import { ISignUpForm } from "../SignUp";
 
-const EmailController = ({
-  control,
-}: {
+type EmailControllerProps = {
   control: Control<ISignUpForm, any>;
-}) => {
+  error: boolean;
+};
+
+const EmailController = ({ control, error }: EmailControllerProps) => {
   return (
     <Controller
       name="email"
       control={control}
+      rules={{ required: "Digit email" }}
       render={({ field }) => (
         <>
           <OutlinedInput
@@ -22,6 +24,7 @@ const EmailController = ({
             type="email"
             margin="none"
             fullWidth={true}
+            error={error}
           />
         </>
       )}

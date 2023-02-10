@@ -5,11 +5,12 @@ import { ISignUpForm } from "../SignUp";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const PasswordController = ({
-  control,
-}: {
+type PasswordControllerProps = {
   control: Control<ISignUpForm, any>;
-}) => {
+  error: boolean;
+};
+
+const PasswordController = ({ control, error }: PasswordControllerProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const tooglePassword = () => setShowPassword(!showPassword);
@@ -18,6 +19,7 @@ const PasswordController = ({
     <Controller
       name="password"
       control={control}
+      rules={{ required: "Invalid password" }}
       render={({ field }) => (
         <>
           <OutlinedInput
@@ -28,6 +30,7 @@ const PasswordController = ({
             type={showPassword ? "text" : "password"}
             margin="none"
             fullWidth={true}
+            error={error}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton

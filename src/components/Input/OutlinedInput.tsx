@@ -12,6 +12,7 @@ type OutlinedInputProps = {
   margin: "dense" | "normal" | "none";
   fullWidth: boolean;
   endAdornment?: JSX.Element;
+  error?: boolean;
 };
 
 const OutlinedInput = ({
@@ -23,6 +24,7 @@ const OutlinedInput = ({
   margin,
   fullWidth,
   endAdornment,
+  error = false,
 }: OutlinedInputProps) => {
   return (
     <>
@@ -39,6 +41,7 @@ const OutlinedInput = ({
           {...field}
           label={label}
           endAdornment={endAdornment}
+          error={error}
         />
       </FormControl>
     </>

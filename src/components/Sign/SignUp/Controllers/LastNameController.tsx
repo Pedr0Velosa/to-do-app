@@ -3,15 +3,17 @@ import React from "react";
 import { Control, Controller } from "react-hook-form";
 import { ISignUpForm } from "../SignUp";
 
-const LastNameController = ({
-  control,
-}: {
+type LastNameControllerProps = {
   control: Control<ISignUpForm, any>;
-}) => {
+  error: boolean;
+};
+
+const LastNameController = ({ control, error }: LastNameControllerProps) => {
   return (
     <Controller
       name="lastName"
       control={control}
+      rules={{ required: "Digit last name" }}
       render={({ field }) => (
         <>
           <OutlinedInput
@@ -21,6 +23,7 @@ const LastNameController = ({
             required={true}
             margin="none"
             fullWidth={false}
+            error={error}
           />
         </>
       )}

@@ -5,11 +5,15 @@ import { ISignUpForm } from "../SignUp";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
+type ConfirmedPasswordControllerProps = {
+  control: Control<ISignUpForm, any>;
+  error: boolean;
+};
+
 const ConfirmedPasswordController = ({
   control,
-}: {
-  control: Control<ISignUpForm, any>;
-}) => {
+  error,
+}: ConfirmedPasswordControllerProps) => {
   const [showConfirmedPassword, setShowConfirmedPassword] =
     useState<boolean>(false);
 
@@ -30,6 +34,7 @@ const ConfirmedPasswordController = ({
             type={showConfirmedPassword ? "text" : "password"}
             margin="none"
             fullWidth={true}
+            error={error}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
