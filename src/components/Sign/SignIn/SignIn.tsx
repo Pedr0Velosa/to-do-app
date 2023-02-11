@@ -34,23 +34,19 @@ export default function SignIn() {
   } = useForm<ISignInForm>({
     defaultValues: { email: "", password: "", error: "" },
   });
-  async function onSubmit(data: ISignInForm) {
+  const onSubmit = async (data: ISignInForm) => {
     const { email, password } = data;
     if (!validateForm(email, password)) return;
     const res = await sendRequest(email, password);
     setValue("email", "");
     setValue("password", "");
     if (res.error) {
-      setError(
-        "error",
-        { type: "custom", message: res.error },
-        { shouldFocus: false }
-      );
+      setError("error", { type: "custom", message: res.error }, { shouldFocus: false });
       return;
     }
-  }
+  };
 
-  function validateForm(email: string, password: string) {
+  const validateForm = (email: string, password: string) => {
     if (!email) {
       setError("email", { type: "custom", message: "Email must be provided" });
     }
@@ -68,19 +64,20 @@ export default function SignIn() {
     }
     if (!email || !password || !validateEmail(email)) return false;
     return true;
-  }
-  function validateEmail(email?: string) {
+  };
+  const validateEmail = (email?: string) => {
     if (!email) return true;
     const emailIsValid = /\S+@\S+\.\S+/.test(email);
     return emailIsValid;
-  }
-  async function sendRequest(email: string, password: string) {
+  };
+  const sendRequest = async (email: string, password: string) => {
     const res = await axios("/api/user", {
       method: METHODS.GET,
       params: { email, password },
     }).then((res) => res.data);
     return res;
-  }
+  };
+
   useEffect(() => {
     register("error");
   }, [register]);
@@ -108,20 +105,10 @@ export default function SignIn() {
               {errors.error.message}
             </Typography>
           )}
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-            sx={{ mt: 1 }}
-          >
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
             <EmailController control={control} />
             <PasswordController control={control} />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Sign In
             </Button>
             <Grid container>

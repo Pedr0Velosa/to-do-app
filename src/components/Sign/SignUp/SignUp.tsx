@@ -19,6 +19,8 @@ import UsernameError from "./Errors/UsernameError";
 import EmailError from "./Errors/EmailError";
 import PasswordError from "./Errors/PasswordError";
 import ConfirmedPasswordError from "./Errors/ConfirmedPasswordError";
+import axios from "axios";
+import { METHODS } from "@/utils/Methods";
 
 export type ISignUpForm = {
   firstName: string;
@@ -28,8 +30,22 @@ export type ISignUpForm = {
   ["confirmed-password"]: string;
 };
 
+type sendDataType = {
+  username: string;
+  password: string;
+  email: string;
+};
+
 const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+const defaultValues: ISignUpForm = {
+  firstName: "",
+  lastName: "",
+  password: "",
+  email: "",
+  "confirmed-password": "",
+};
 
 export default function SignUp() {
   const {
@@ -37,23 +53,21 @@ export default function SignUp() {
     setValue,
     control,
     setError,
-    register,
     watch,
+    reset,
     formState: { errors },
   } = useForm<ISignUpForm>({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      password: "",
-      email: "",
-      "confirmed-password": "",
-    },
+    defaultValues,
   });
 
-  const onSubmit = (data: ISignUpForm) => {
+  const onSubmit = async (data: ISignUpForm) => {
     const { firstName, lastName, password, "confirmed-password": confirmed_password, email } = data;
     if (!validatePasswords(password, confirmed_password) || !validateEmail(email)) return;
     const username = `${firstName} ${lastName}`;
+    const res = await sendData({ username, password, email });
+    if (res.statusText === "OK") {
+      reset(defaultValues);
+    }
   };
   const validatePasswords = (password: string, confirmed_password: string) => {
     const passwordIsValid = passwordRegex.test(password);
@@ -85,6 +99,16 @@ export default function SignUp() {
       return false;
     }
     return true;
+  };
+  const sendData = async ({ username, password, email }: sendDataType) => {
+    return await axios("/api/user", {
+      method: METHODS.CREATE,
+      data: {
+        username,
+        password,
+        email,
+      },
+    });
   };
   return (
     <Container component="main" maxWidth="xs">
