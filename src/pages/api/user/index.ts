@@ -17,11 +17,15 @@ export default async function handler(req: UserApiRequest, res: NextApiResponse)
 
     if (!email || !password) return res.end();
 
-    // const validPassword = await bcrypt.compare(req.body.password, user.password);
-
     try {
-      const data = getUser({ email, password });
+      const data = await getUser({ email });
+
       if (!data) return res.status(200).json({ error: "User not found" });
+
+      const validPassword = await bcrypt.compare(password, data.password);
+
+      if (!validPassword) return res.status(200).json({ error: "Email or password is incorrect" });
+
       return res.send(data);
     } catch (err) {
       return;
@@ -42,6 +46,10 @@ export default async function handler(req: UserApiRequest, res: NextApiResponse)
     } catch (err) {
       return;
     }
+  }
+  if (method === "PUT") {
+  }
+  if (method === "DELETE") {
   }
   return res.status(404).send({ error: "Route not found" });
 }
