@@ -1,18 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/libs/prisma";
 
-export default async function handlerCreate(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handlerCreate(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
   if (method === "POST") {
-    const { title } = req.body;
-    if (!title) return res.end();
+    const { title, user_Id } = req.body;
+    if (!title || !user_Id) return res.end();
     try {
       await prisma.to_do.create({
         data: {
-          user_Id: "a1f74e1e-9275-4245-9356-70abefcb7248",
+          user_Id,
           title,
           status: "to-do",
         },

@@ -21,6 +21,7 @@ import PasswordError from "./Errors/PasswordError";
 import ConfirmedPasswordError from "./Errors/ConfirmedPasswordError";
 import axios from "axios";
 import { METHODS } from "@/utils/Methods";
+import Router from "next/router";
 
 export type ISignUpForm = {
   firstName: string;
@@ -67,6 +68,7 @@ export default function SignUp() {
     const res = await sendData({ username, password, email });
     if (res.statusText === "OK") {
       reset(defaultValues);
+      Router.push("/signin");
     }
   };
   const validatePasswords = (password: string, confirmed_password: string) => {

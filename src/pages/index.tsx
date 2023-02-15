@@ -1,10 +1,12 @@
-import Header from "@/components/Header/Hearder";
+import Header from "@/components/Header/Header";
 import NewItemController from "@/components/NewItem/Controller";
-import { Box, Container } from "@mui/system";
-import { NextPage } from "next";
+import getUser from "@/services/user/getUser";
+import { Container } from "@mui/system";
+import { NextPage, GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
+import { parseCookies } from "nookies";
 
-const HomePage: NextPage = (): JSX.Element => {
+const HomePage: NextPage = ({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
       <Head>
@@ -13,19 +15,27 @@ const HomePage: NextPage = (): JSX.Element => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header username={data.username} />
       <Container>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <NewItemController />
-        </Box>
+        <NewItemController />
       </Container>
     </>
   );
 };
 export default HomePage;
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { "auth.token": token, "userid.token": tokenId } = parseCookies(ctx);
+  if (!token || !tokenId) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/signin",
+      },
+    };
+  }
+  const data = await getUser({ id: tokenId });
+  return {
+    props: { data },
+  };
+};

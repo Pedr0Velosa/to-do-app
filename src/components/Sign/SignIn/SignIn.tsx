@@ -14,6 +14,7 @@ import axios from "axios";
 import { METHODS } from "@/utils/Methods";
 import EmailController from "./Controllers/EmailController";
 import PasswordController from "./Controllers/PasswordController";
+import useAuth from "@/utils/hooks/useAuth";
 
 const theme = createTheme();
 
@@ -24,6 +25,8 @@ export type ISignInForm = {
 };
 
 export default function SignIn() {
+  const { signIn } = useAuth();
+
   const {
     handleSubmit,
     setValue,
@@ -44,6 +47,7 @@ export default function SignIn() {
       setError("error", { type: "custom", message: res.error }, { shouldFocus: false });
       return;
     }
+    signIn(res);
   };
 
   const validateForm = (email: string, password: string) => {

@@ -6,54 +6,44 @@ import InputLabel from "@mui/material/InputLabel";
 import InputAdornment from "@mui/material/InputAdornment";
 import FormControl from "@mui/material/FormControl";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import axios from "axios";
-import addNotification from "@libs/toast/addNotification";
 import { Typography } from "@mui/material";
 import type { INewItemForm } from "./Controller";
-import type {
-  ControllerRenderProps,
-  FieldErrors,
-  UseFormHandleSubmit,
-  UseFormSetError,
-  UseFormSetValue,
-} from "react-hook-form";
+import type { ControllerRenderProps, FieldErrors, UseFormHandleSubmit } from "react-hook-form";
 
 type InputProps = {
   field: ControllerRenderProps<INewItemForm, "title">;
   handleSubmit: UseFormHandleSubmit<INewItemForm>;
   errors: FieldErrors<INewItemForm>;
-  onClick: (data: INewItemForm) => void;
+  createToDo: ({ title }: { title: string }) => void;
 };
 
-const Input = ({ field, handleSubmit, errors, onClick }: InputProps) => {
+const Input = ({ field, handleSubmit, errors, createToDo }: InputProps) => {
   return (
-    <Box sx={{ mt: 6, maxWidth: "60ch", width: "100%" }}>
-      <FormControl variant="filled" fullWidth>
-        <InputLabel htmlFor="new-item">New To Do</InputLabel>
-        <FilledInput
-          id="new-item"
-          type={"text"}
-          placeholder="Create a New To Do"
-          error={!!errors.title}
-          {...field}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="create to do"
-                onClick={handleSubmit(onClick)}
-                edge="end"
-              >
-                <NoteAddIcon />
-              </IconButton>
-            </InputAdornment>
-          }
-        />
-        {errors.title && (
-          <Typography color={"error"} component={"p"} variant="subtitle1">
-            {errors.title.message}
-          </Typography>
-        )}
-      </FormControl>
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Box sx={{ mt: 6, maxWidth: "60ch", width: "100%" }} component={"form"} onSubmit={handleSubmit(createToDo)}>
+        <FormControl variant="filled" fullWidth>
+          <InputLabel htmlFor="new-item">New To Do</InputLabel>
+          <FilledInput
+            id="new-item"
+            type={"text"}
+            placeholder="Create a New To Do"
+            error={!!errors.title}
+            {...field}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton aria-label="create to do" onClick={handleSubmit(createToDo)} edge="end">
+                  <NoteAddIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+          {errors.title && (
+            <Typography color={"error"} component={"p"} variant="subtitle1">
+              {errors.title.message}
+            </Typography>
+          )}
+        </FormControl>
+      </Box>
     </Box>
   );
 };

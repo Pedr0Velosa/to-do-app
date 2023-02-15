@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import getUser from "@/libs/backend/user/getUsers";
-import createUser from "@/libs/backend/user/createUser";
 import bcrypt from "bcrypt";
+import getUser from "@/services/user/getUser";
+import createUser from "@/services/user/createUser";
 
 type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
@@ -18,14 +18,13 @@ export default async function handler(req: UserApiRequest, res: NextApiResponse)
     if (!email || !password) return res.end();
 
     try {
-      const data = await getUser({ email });
+      const { password: userPassword, ...data } = await getUser({ email });
 
-      if (!data) return res.status(200).json({ error: "User not found" });
+      if (!data || !userPassword) return res.status(200).json({ error: "User not found" });
 
-      const validPassword = await bcrypt.compare(password, data.password);
+      const validPassword = await bcrypt.compare(password, userPassword);
 
       if (!validPassword) return res.status(200).json({ error: "Email or password is incorrect" });
-
       return res.send(data);
     } catch (err) {
       return;

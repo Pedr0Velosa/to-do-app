@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "server": "concurrently --kill-others \"npm run server:main\" \"npm run server:shadow\" \"npm run server:prisma\"",
+    "server": "concurrently \"npm run server:main\" \"npm run server:shadow\" \"npm run server:prisma\"",
     "server:main": "pscale connect to-do-app main --port 3309",
     "server:shadow": "pscale connect to-do-app shadow --port 3310",
     "server:prisma": "npx prisma studio"
@@ -37,10 +37,12 @@
     "react-toastify": "^9.1.1",
     "styled-components": "^5.3.6",
     "swr": "^2.0.3",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/uuid": "^9.0.0",
     "concurrently": "^7.6.0",
     "prisma": "^4.10.0"
   }
