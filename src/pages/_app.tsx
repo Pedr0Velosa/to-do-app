@@ -12,29 +12,35 @@ import "react-toastify/dist/ReactToastify.css";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 
+import { QueryClient, QueryClientProvider } from "react-query";
+
 import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient();
+
   return (
     <>
-      <AuthProvider>
-        <DndProvider backend={HTML5Backend}>
-          <Component {...pageProps} />
-          <ToastContainer
-            position="top-right"
-            autoClose={2 * 1000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-          <ToastContainer />
-        </DndProvider>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <DndProvider backend={HTML5Backend}>
+            <Component {...pageProps} />
+            <ToastContainer
+              position="top-right"
+              autoClose={2 * 1000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+            <ToastContainer />
+          </DndProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </>
   );
 }
