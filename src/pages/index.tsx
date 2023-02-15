@@ -1,3 +1,4 @@
+import Main from "@/components/Main/Main";
 import Header from "@/components/Header/Header";
 import NewItemController from "@/components/NewItem/Controller";
 import getUser from "@/services/user/getUser";
@@ -16,8 +17,9 @@ const HomePage: NextPage = ({ data }: InferGetServerSidePropsType<typeof getServ
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header username={data.username} />
-      <Container>
+      <Container sx={{ display: "grid", gridTemplateRows: "auto 1fr" }}>
         <NewItemController />
+        <Main />
       </Container>
     </>
   );

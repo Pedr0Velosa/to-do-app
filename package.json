@@ -32,6 +32,8 @@
     "nookies": "^2.5.2",
     "prettier": "^2.8.4",
     "react": "18.2.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.1",
     "react-toastify": "^9.1.1",
