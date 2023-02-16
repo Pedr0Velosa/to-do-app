@@ -5,11 +5,12 @@ import { useQuery } from "react-query";
 import useAuth from "@/utils/hooks/useAuth";
 import axios from "axios";
 import { METHODS } from "@/utils/Methods";
+import { separateDataType } from "@/services/todo/separateTodo";
 
 const Main = () => {
   const { user } = useAuth();
-  const { data } = useQuery({
-    queryKey: "todos",
+  const { data } = useQuery<separateDataType>({
+    queryKey: ["todos"],
     queryFn: async () => {
       return await axios("/api/todo", { method: METHODS.GET, params: { user_Id: user?.id } }).then(
         (response) => response.data

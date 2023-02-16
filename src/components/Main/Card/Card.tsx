@@ -11,14 +11,28 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import { Todo } from "@/utils/types/Todo";
+import { useDrag } from "react-dnd";
+import { ItemType } from "@/utils/ItemType";
 
 type CardProps = {
   todo: Todo;
 };
 
 const Card = ({ todo }: CardProps) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemType.CARD,
+    item: { id: todo.id },
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult();
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+      handlerId: monitor.getHandlerId(),
+    }),
+  }));
+  const opacity = isDragging ? 0.4 : 1;
   return (
-    <MuiCard>
+    <MuiCard id={todo.id} ref={drag}>
       <CardContent>
         <Typography variant="h6" component="h1">
           {todo.title}

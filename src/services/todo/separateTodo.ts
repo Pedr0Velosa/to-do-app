@@ -9,7 +9,7 @@ type dataType = {
   tasks: Task[];
 };
 
-type separateDataType = {
+export type separateDataType = {
   "to-do": dataType[];
   doing: dataType[];
   done: dataType[];
