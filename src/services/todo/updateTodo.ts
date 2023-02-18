@@ -12,6 +12,7 @@ export default async function updateTodo({ id, status }: updateTodoType) {
     },
     data: {
       status,
+      updatedAt: new Date(),
     },
   });
 }

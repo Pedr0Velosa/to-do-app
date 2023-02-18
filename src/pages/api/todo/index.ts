@@ -48,8 +48,7 @@ export default async function handlerCreate(req: UserApiRequest, res: NextApiRes
   if (method === "PUT") {
     const { id, status } = req.query;
     try {
-      const query = (await updateTodo({ id, status })) as unknown as dataType[];
-      // const data = separateTodo(query);
+      await updateTodo({ id, status });
       return res.send("To do updated");
     } catch (err) {
       return res.status(404).send({ error: "Failed to update data" });

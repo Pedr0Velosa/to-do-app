@@ -17,6 +17,8 @@ const Main = () => {
       );
     },
     enabled: !!user,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
   });
   return (
     <Box

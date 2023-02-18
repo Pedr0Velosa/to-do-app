@@ -18,7 +18,10 @@ type DraggableSectionType = {
 const DraggableSection = ({ status, data }: DraggableSectionType) => {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemType.CARD,
-    drop: ({ id }: { id: string }) => mutation.mutate(id),
+    drop: ({ id, todoStatus }: { id: string; todoStatus: KanbanStatus }) => {
+      if (todoStatus === status) return;
+      mutation.mutate(id);
+    },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -30,19 +33,19 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
     mutationFn: (id: string) => {
       return sendRequest(id);
     },
-    // onMutate: async (newTodo: string) => {
-    //   await queryClient.cancelQueries({ queryKey: ["todos"] });
+    onMutate: async (todoID: any) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
 
-    //   const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
-    //   // if (previousTodos) {
-    //   //   queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
-    //   //     ...old,
-    //   //     "to-do": [...old["to-do"], { id: 0, title: newTodo, status: "to-do", tasks: [], updatedAt: new Date() }],
-    //   //   }));
-    //   // }
+      const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
+      if (previousTodos) {
+        const { todoIndex, changedTodo } = getTodoAndTodoIndex(previousTodos, todoID);
 
-    //   return { previousTodos };
-    // },
+        if (todoIndex === -1 || todoIndex === undefined || !changedTodo) return;
+
+        previousTodos[status].push(changedTodo);
+      }
+      return { previousTodos };
+    },
     onError: (err, newTodo, context) => {
       if (context?.previousTodos) {
         queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
@@ -52,14 +55,29 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },
   });
+  const getTodoAndTodoIndex = (previousTodos: separateDataType | undefined, todoID: string) => {
+    if (!previousTodos) return { todoIndex: undefined, changedTodo: undefined };
+    let todoIndex: number = -1,
+      changedTodo: Todo = {} as Todo;
 
+    const keys: KanbanStatus[] = Object.keys(previousTodos) as KanbanStatus[];
+
+    keys.forEach((todoStatus: KanbanStatus) => {
+      if (todoIndex !== -1) return;
+      todoIndex = previousTodos[todoStatus].findIndex(({ id }) => id === todoID);
+      changedTodo = previousTodos[todoStatus][todoIndex];
+      previousTodos[todoStatus].splice(todoIndex, 1);
+    });
+
+    return { todoIndex, changedTodo };
+  };
   const sendRequest = async (id: string) => {
     return await axios("/api/todo", { method: METHODS.UPDATE, params: { id, status } }).then(
       (response) => response.data
     );
   };
 
-  const isActive = canDrop && isOver;
+  const opacity = canDrop && isOver ? 0.5 : 1;
   return (
     <Box
       ref={drop}
@@ -71,6 +89,7 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
         display: "flex",
         flexDirection: "column",
         gap: 2,
+        opacity,
       }}
     >
       {!data ? (

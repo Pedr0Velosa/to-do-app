@@ -21,7 +21,7 @@ type CardProps = {
 const Card = ({ todo }: CardProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemType.CARD,
-    item: { id: todo.id },
+    item: { id: todo.id, todoStatus: todo.status },
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult();
     },
@@ -30,9 +30,9 @@ const Card = ({ todo }: CardProps) => {
       handlerId: monitor.getHandlerId(),
     }),
   }));
-  const opacity = isDragging ? 0.4 : 1;
+  const opacity = isDragging ? 0.5 : 1;
   return (
-    <MuiCard id={todo.id} ref={drag}>
+    <MuiCard id={todo.id} ref={drag} sx={{ opacity }}>
       <CardContent>
         <Typography variant="h6" component="h1">
           {todo.title}
