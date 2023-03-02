@@ -2,38 +2,62 @@ import { Task } from "@/utils/types/Task";
 import { Checkbox, IconButton, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import React from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import axios from "axios";
+import { METHODS } from "@/utils/Methods";
+import { separateDataType } from "@/services/todo/separateTodo";
+import { KanbanStatus } from "@/utils/types/Kanban";
 
-const Task = ({ task }: { task: Task }) => {
-  // const queryClient = useQueryClient();
+const Task = ({ task, status }: { task: Task; status: KanbanStatus }) => {
+  const queryClient = useQueryClient();
+  const { isFetching } = useQuery<separateDataType>({
+    queryKey: ["todos"],
+  });
+  const mutation = useMutation({
+    mutationFn: () => {
+      return updateTask();
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
 
-  // const mutation = useMutation({
-  //   mutationFn: (id: string) => {
-  //     return sendRequest();
-  //   },
-  //   onMutate: async (todoID: any) => {
-  //     await queryClient.cancelQueries({ queryKey: ["todos"] });
-
-  //     const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
-  //     if (previousTodos) {
-  //       const newTask = getValues("newTask");
-  //       if (!newTask) return;
-  //       previousTodos[todo.status]
-  //         .find(({ id }: { id: string }) => id === todo.id)
-  //         ?.tasks.push({ id: "1", title: newTask, done: false, to_do_Id: todo.id });
-  //     }
-  //     return { previousTodos };
-  //   },
-  //   onError: (err, newTodo, context) => {
-  //     if (context?.previousTodos) {
-  //       queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
-  //     }
-  //   },
-  //   onSettled: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["todos"] });
-  //   },
-  // });
-
+      const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
+      if (previousTodos) {
+        queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
+          ...old,
+          [status]: old[status].map((todo) => {
+            if (todo.id === task.to_do_Id) {
+              return {
+                ...todo,
+                tasks: todo.tasks.map((t) => {
+                  if (t.id === task.id) {
+                    return { ...t, done: !t.done };
+                  }
+                  return t;
+                }),
+              };
+            }
+            return todo;
+          }),
+        }));
+      }
+      return { previousTodos };
+    },
+    onError: (err, newTask, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+  const updateTask = async () => {
+    if (isFetching) return;
+    await axios("/api/task", {
+      method: METHODS.UPDATE,
+      data: { id: task.id, done: task.done },
+    });
+  };
   return (
     <>
       <ListItem
@@ -45,11 +69,11 @@ const Task = ({ task }: { task: Task }) => {
           </IconButton>
         }
       >
-        <ListItemButton dense>
+        <ListItemButton dense onClick={() => mutation.mutate()}>
           <ListItemIcon>
             <Checkbox
               edge="start"
-              checked={false}
+              checked={task.done}
               tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": task.id }}

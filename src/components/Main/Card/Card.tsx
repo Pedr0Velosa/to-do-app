@@ -43,10 +43,10 @@ const Card = ({ todo }: CardProps) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (id: string) => {
+    mutationFn: () => {
       return sendRequest();
     },
-    onMutate: async (todoID: any) => {
+    onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["todos"] });
 
       const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
@@ -59,7 +59,7 @@ const Card = ({ todo }: CardProps) => {
       }
       return { previousTodos };
     },
-    onError: (err, newTodo, context) => {
+    onError: (err, newTask, context) => {
       if (context?.previousTodos) {
         queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
       }
@@ -86,12 +86,12 @@ const Card = ({ todo }: CardProps) => {
     );
   };
   const onBlurNewTask = () => {
-    mutation.mutate(todo.id);
+    mutation.mutate();
     setIsNewTaskVisible(false);
   };
   const onKeyDownNewTask = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      mutation.mutate(todo.id);
+      mutation.mutate();
       setIsNewTaskVisible(false);
       return;
     }
@@ -116,7 +116,7 @@ const Card = ({ todo }: CardProps) => {
       <CardContent sx={{ py: 0 }}>
         <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }} disablePadding>
           {todo.tasks.map((task) => (
-            <Task task={task} key={task.id} />
+            <Task task={task} key={task.id} status={todo.status} />
           ))}
           {isNewTaskVisible ? (
             <NewTaskController control={control} onBlur={onBlurNewTask} onKeyDown={onKeyDownNewTask} />
