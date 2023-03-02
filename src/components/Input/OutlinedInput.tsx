@@ -25,15 +25,11 @@ const OutlinedInput = ({
   fullWidth,
   endAdornment,
   error = false,
+  ...rest
 }: OutlinedInputProps) => {
   return (
     <>
-      <FormControl
-        variant="outlined"
-        fullWidth={fullWidth}
-        required={required}
-        margin={margin}
-      >
+      <FormControl variant="outlined" fullWidth={fullWidth} required={required} margin={margin}>
         <InputLabel htmlFor={id}>{label}</InputLabel>
         <MuiOutlinedInput
           id={id}
@@ -42,6 +38,7 @@ const OutlinedInput = ({
           label={label}
           endAdornment={endAdornment}
           error={error}
+          {...rest}
         />
       </FormControl>
     </>

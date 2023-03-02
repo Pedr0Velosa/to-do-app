@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/libs/prisma";
 import { separateTodo } from "@/services/todo/separateTodo";
 import { KanbanStatus } from "@/utils/types/Kanban";
 import { Task } from "@/utils/types/Task";
