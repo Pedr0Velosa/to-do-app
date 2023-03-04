@@ -10,9 +10,6 @@ import { KanbanStatus } from "@/utils/types/Kanban";
 
 const Task = ({ task, status }: { task: Task; status: KanbanStatus }) => {
   const queryClient = useQueryClient();
-  const { isFetching } = useQuery<separateDataType>({
-    queryKey: ["todos"],
-  });
   const mutation = useMutation({
     mutationFn: () => {
       return updateTask();
@@ -52,7 +49,6 @@ const Task = ({ task, status }: { task: Task; status: KanbanStatus }) => {
     },
   });
   const updateTask = async () => {
-    if (isFetching) return;
     await axios("/api/task", {
       method: METHODS.UPDATE,
       data: { id: task.id, done: task.done },
