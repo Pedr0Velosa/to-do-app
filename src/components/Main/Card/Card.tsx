@@ -43,8 +43,10 @@ const Card = ({ todo }: CardProps) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () => {
-      return sendRequest();
+    mutationFn: async (newTask: string) => {
+      return await axios("/api/task", { method: "POST", params: { to_do_Id: todo.id, title: newTask } }).then(() =>
+        setValue("newTask", "")
+      );
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["todos"] });
@@ -81,17 +83,15 @@ const Card = ({ todo }: CardProps) => {
   const sendRequest = async () => {
     const newTask = getValues("newTask");
     if (!newTask) return;
-    await axios("/api/task", { method: "POST", params: { to_do_Id: todo.id, title: newTask } }).then(() =>
-      setValue("newTask", "")
-    );
+    mutation.mutate(newTask);
   };
   const onBlurNewTask = () => {
-    mutation.mutate();
+    sendRequest();
     setIsNewTaskVisible(false);
   };
   const onKeyDownNewTask = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      mutation.mutate();
+      sendRequest();
       setIsNewTaskVisible(false);
       return;
     }
@@ -115,7 +115,7 @@ const Card = ({ todo }: CardProps) => {
       </CardActions>
       <CardContent sx={{ py: 0 }}>
         <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }} disablePadding>
-          {todo.tasks.map((task) => (
+          {todo.tasks?.map((task) => (
             <Task task={task} key={task.id} status={todo.status} />
           ))}
           {isNewTaskVisible ? (
