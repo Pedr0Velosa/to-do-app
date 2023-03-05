@@ -9,7 +9,7 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import { Typography } from "@mui/material";
 import type { INewItemForm } from "./Controller";
 import type { ControllerRenderProps, FieldErrors, UseFormHandleSubmit } from "react-hook-form";
-import { UseMutationResult } from "react-query";
+import { UseMutationResult } from "@tanstack/react-query";
 
 type InputProps = {
   field: ControllerRenderProps<INewItemForm, "title">;

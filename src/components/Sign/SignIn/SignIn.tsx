@@ -40,7 +40,7 @@ export default function SignIn() {
   const onSubmit = async (data: ISignInForm) => {
     const { email, password } = data;
     if (!validateForm(email, password)) return;
-    const res = await sendRequest(email, password);
+    const res = await verifyUser(email, password);
     setValue("email", "");
     setValue("password", "");
     if (res.error) {
@@ -74,7 +74,7 @@ export default function SignIn() {
     const emailIsValid = /\S+@\S+\.\S+/.test(email);
     return emailIsValid;
   };
-  const sendRequest = async (email: string, password: string) => {
+  const verifyUser = async (email: string, password: string) => {
     const res = await axios("/api/user", {
       method: METHODS.GET,
       params: { email, password },

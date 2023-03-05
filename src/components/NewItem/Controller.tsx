@@ -5,7 +5,7 @@ import axios from "axios";
 import addNotification from "@/libs/toast/addNotification";
 import { METHODS } from "@/utils/Methods";
 import useAuth from "@/utils/hooks/useAuth";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { separateDataType } from "@/services/todo/separateTodo";
 import { v4 as uuid } from "uuid";
 

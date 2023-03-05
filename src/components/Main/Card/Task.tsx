@@ -2,7 +2,7 @@ import { Task } from "@/utils/types/Task";
 import { Checkbox, IconButton, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import React from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { METHODS } from "@/utils/Methods";
 import { separateDataType } from "@/services/todo/separateTodo";
@@ -81,8 +81,6 @@ const Task = ({ task, status }: { task: Task; status: KanbanStatus }) => {
             return todo;
           }),
         }));
-        const aaa = queryClient.getQueryData<separateDataType>(["todos"]);
-        console.log(aaa);
       }
       return { previousTodos };
     },

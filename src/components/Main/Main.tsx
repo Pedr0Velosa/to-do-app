@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import React from "react";
 import DraggableSection from "./DraggableSection/DraggableSection";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import useAuth from "@/utils/hooks/useAuth";
 import axios from "axios";
 import { METHODS } from "@/utils/Methods";
@@ -17,8 +17,6 @@ const Main = () => {
       );
     },
     enabled: !!user,
-    keepPreviousData: true,
-    refetchOnWindowFocus: false,
   });
   return (
     <Box

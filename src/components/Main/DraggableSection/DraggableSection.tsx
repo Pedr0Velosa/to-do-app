@@ -5,7 +5,7 @@ import { KanbanStatus } from "@/utils/types/Kanban";
 import { Todo } from "@/utils/types/Todo";
 import { useDrop } from "react-dnd";
 import { ItemType } from "@/utils/ItemType";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { separateDataType } from "@/services/todo/separateTodo";
 import axios from "axios";
 import { METHODS } from "@/utils/Methods";
@@ -20,7 +20,7 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
     accept: ItemType.CARD,
     drop: ({ id, todoStatus }: { id: string; todoStatus: KanbanStatus }) => {
       if (todoStatus === status) return;
-      mutation.mutate(id);
+      mutation.mutate({ id, prevStatus: todoStatus });
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -30,19 +30,24 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (id: string) => {
+    mutationFn: ({ id, prevStatus }: { id: string; prevStatus: KanbanStatus }) => {
       return sendRequest(id);
     },
-    onMutate: async (todoID: any) => {
+    onMutate: async ({ id: todoID, prevStatus }) => {
       await queryClient.cancelQueries({ queryKey: ["todos"] });
 
       const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
+
       if (previousTodos) {
-        const { todoIndex, changedTodo } = getTodoAndTodoIndex(previousTodos, todoID);
-
-        if (todoIndex === -1 || todoIndex === undefined || !changedTodo) return;
-
-        previousTodos[status].push(changedTodo);
+        let movedItem = previousTodos[prevStatus].find((item) => item.id === todoID);
+        movedItem!.status = status;
+        queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
+          ...old,
+          [prevStatus]: old[prevStatus].filter((item) => {
+            return item.id !== todoID ? item : null;
+          }),
+          [status]: [movedItem, ...old[status]],
+        }));
       }
       return { previousTodos };
     },
@@ -55,22 +60,7 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },
   });
-  const getTodoAndTodoIndex = (previousTodos: separateDataType | undefined, todoID: string) => {
-    if (!previousTodos) return { todoIndex: undefined, changedTodo: undefined };
-    let todoIndex: number = -1,
-      changedTodo: Todo = {} as Todo;
 
-    const keys: KanbanStatus[] = Object.keys(previousTodos) as KanbanStatus[];
-
-    keys.forEach((todoStatus: KanbanStatus) => {
-      if (todoIndex !== -1) return;
-      todoIndex = previousTodos[todoStatus].findIndex(({ id }) => id === todoID);
-      changedTodo = previousTodos[todoStatus][todoIndex];
-      previousTodos[todoStatus].splice(todoIndex, 1);
-    });
-
-    return { todoIndex, changedTodo };
-  };
   const sendRequest = async (id: string) => {
     return await axios("/api/todo", { method: METHODS.UPDATE, params: { id, status } }).then(
       (response) => response.data

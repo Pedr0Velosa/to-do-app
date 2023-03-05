@@ -13,7 +13,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { Todo } from "@/utils/types/Todo";
 import { useDrag } from "react-dnd";
 import { ItemType } from "@/utils/ItemType";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { separateDataType } from "@/services/todo/separateTodo";
 import axios from "axios";
 import Task from "./Task";
@@ -42,7 +42,7 @@ const Card = ({ todo }: CardProps) => {
   }));
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const createTask = useMutation({
     mutationFn: async (newTask: string) => {
       return await axios("/api/task", { method: "POST", params: { to_do_Id: todo.id, title: newTask } }).then(() =>
         setValue("newTask", "")
@@ -55,9 +55,18 @@ const Card = ({ todo }: CardProps) => {
       if (previousTodos) {
         const newTask = getValues("newTask");
         if (!newTask) return;
-        previousTodos[todo.status]
-          .find(({ id }: { id: string }) => id === todo.id)
-          ?.tasks.push({ id: "1", title: newTask, done: false, to_do_Id: todo.id });
+        queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
+          ...old,
+          [todo.status]: old[todo.status].map((prevTodo) => {
+            if (prevTodo.id === todo.id) {
+              return {
+                ...prevTodo,
+                tasks: [{ id: "1", title: newTask, done: false, to_do_Id: todo.id }, ...prevTodo.tasks],
+              };
+            }
+            return prevTodo;
+          }),
+        }));
       }
       return { previousTodos };
     },
@@ -83,7 +92,7 @@ const Card = ({ todo }: CardProps) => {
   const sendRequest = async () => {
     const newTask = getValues("newTask");
     if (!newTask) return;
-    mutation.mutate(newTask);
+    createTask.mutate(newTask);
   };
   const onBlurNewTask = () => {
     sendRequest();
