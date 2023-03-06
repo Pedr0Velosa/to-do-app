@@ -1,7 +1,7 @@
 import React from "react";
 import OutlinedInput from "@components/Input/OutlinedInput";
 import { Control, Controller } from "react-hook-form";
-import { newTask } from "./Card";
+import { newTask } from "./TasksController";
 
 const NewTaskController = ({
   control,

@@ -29,8 +29,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signIn = ({ id, username, email }: userProps) => {
     const { token, user } = signInRequest({ id, username, email });
-    setCookie(undefined, "auth.token", token);
-    setCookie(undefined, "userid.token", user.id);
+    setCookie(undefined, "auth.token", token, { httpOnly: true });
+    setCookie(undefined, "userid.token", user.id, { httpOnly: true });
 
     setUser(user);
 
