@@ -1,7 +1,7 @@
 import { KanbanStatus } from "@/utils/types/Kanban";
 import { Task } from "@/utils/types/Task";
 
-type dataType = {
+export type dataType = {
   id: string;
   status: KanbanStatus;
   title: string;

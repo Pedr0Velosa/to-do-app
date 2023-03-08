@@ -13,9 +13,12 @@ import { Box, ButtonBase } from "@mui/material";
 import ModalWrapper from "@/components/Modal/ModalWrapper";
 import CardInfo from "./Modals/CardInfo";
 
+import NewTaskController from "./Tasks/NewTaskController";
+
 type CardProps = {
   todo: Todo;
 };
+export type newTask = { newTask: string };
 
 const Card = ({ todo }: CardProps) => {
   const [isNewTaskInputVisible, setIsNewTaskInputVisible] = useState<boolean>(false);
@@ -40,7 +43,6 @@ const Card = ({ todo }: CardProps) => {
   const closeModal = () => setIsOpenModal(false);
 
   const opacity = isDragging ? 0.5 : 1;
-
   return (
     <>
       <ModalWrapper isOpen={isOpenModal} open={openModal} close={closeModal}>
@@ -71,13 +73,10 @@ const Card = ({ todo }: CardProps) => {
         </CardActions>
         <CardContent sx={{ py: 0 }}>
           <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }} disablePadding>
-            <TasksController
-              tasks={todo.tasks}
-              status={todo.status}
-              isNewTaskInputVisible={isNewTaskInputVisible}
-              todoID={todo.id}
-              setNewTaskInputFalse={setNewTaskInputFalse}
-            />
+            <TasksController tasks={todo.tasks} status={todo.status} />
+            {isNewTaskInputVisible ? (
+              <NewTaskController todoprops={todo} setNewTaskInputFalse={setNewTaskInputFalse} />
+            ) : null}
           </List>
         </CardContent>
       </MuiCard>

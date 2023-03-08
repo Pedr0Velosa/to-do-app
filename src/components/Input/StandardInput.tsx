@@ -1,12 +1,11 @@
-import { FormControl, InputLabel } from "@mui/material";
-import MuiOutlinedInput from "@mui/material/OutlinedInput";
+import { FormControl } from "@mui/material";
+import Input from "@mui/material/Input";
 import React from "react";
 import { ControllerRenderProps } from "react-hook-form";
 
-type OutlinedInputProps = {
+type StandardInputProps = {
   field: ControllerRenderProps<any, any>;
   id: string;
-  label: string;
   margin: "dense" | "normal" | "none";
   fullWidth: boolean;
   type?: "text" | "password" | "email";
@@ -15,34 +14,24 @@ type OutlinedInputProps = {
   error?: boolean;
 };
 
-const OutlinedInput = ({
+const StandardInput = ({
   field,
   id,
   type = "text",
-  label,
   required = false,
   margin,
   fullWidth,
   endAdornment,
   error = false,
   ...rest
-}: OutlinedInputProps) => {
+}: StandardInputProps) => {
   return (
     <>
       <FormControl variant="outlined" fullWidth={fullWidth} required={required} margin={margin}>
-        <InputLabel htmlFor={id}>{label}</InputLabel>
-        <MuiOutlinedInput
-          id={id}
-          type={type}
-          {...field}
-          label={label}
-          endAdornment={endAdornment}
-          error={error}
-          {...rest}
-        />
+        <Input id={id} type={type} {...field} endAdornment={endAdornment} error={error} {...rest} />
       </FormControl>
     </>
   );
 };
 
-export default OutlinedInput;
+export default StandardInput;

@@ -9,61 +9,14 @@ import { KanbanStatus } from "@/utils/types/Kanban";
 import type { Task as TaskType } from "@/utils/types/Task";
 import { METHODS } from "@/utils/Methods";
 
-export type newTask = { newTask: string };
-
 type TasksProps = {
   tasks: TaskType[];
   status: KanbanStatus;
-  isNewTaskInputVisible: boolean;
-  todoID: string;
-  setNewTaskInputFalse: () => void;
 };
 
-const TasksController = ({ tasks, status, isNewTaskInputVisible, todoID, setNewTaskInputFalse }: TasksProps) => {
-  const {
-    setValue,
-    control,
-    getValues,
-    formState: { errors },
-  } = useForm<newTask>({ defaultValues: { newTask: "" } });
-
+const TasksController = ({ tasks, status }: TasksProps) => {
   const queryClient = useQueryClient();
-  const doCreateTask = useMutation({
-    mutationFn: async (newTask: string) => {
-      return await axios("/api/task", { method: METHODS.CREATE, params: { to_do_Id: todoID, title: newTask } }).then(
-        () => setValue("newTask", "")
-      );
-    },
-    onMutate: async (newTask) => {
-      await queryClient.cancelQueries({ queryKey: ["todos"] });
 
-      const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
-      if (previousTodos) {
-        if (!newTask) return { previousTodos };
-        queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
-          ...old,
-          [status]: old[status].map((prevTodo) => {
-            if (prevTodo.id === todoID) {
-              return {
-                ...prevTodo,
-                tasks: [{ id: "1", title: newTask, done: false, to_do_Id: todoID }, ...prevTodo.tasks],
-              };
-            }
-            return prevTodo;
-          }),
-        }));
-      }
-      return { previousTodos };
-    },
-    onError: (err, newTask, context) => {
-      if (context?.previousTodos) {
-        queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
-    },
-  });
   const doUpdateTask = useMutation({
     mutationFn: (task: TaskType) => {
       return axios("/api/task", {
@@ -116,6 +69,8 @@ const TasksController = ({ tasks, status, isNewTaskInputVisible, todoID, setNewT
       await queryClient.cancelQueries({ queryKey: ["todos"] });
 
       const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
+      console.log(previousTodos);
+
       if (previousTodos) {
         queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
           ...old,
@@ -134,6 +89,8 @@ const TasksController = ({ tasks, status, isNewTaskInputVisible, todoID, setNewT
             return todo;
           }),
         }));
+        const aa = queryClient.getQueryData<separateDataType>(["todos"]);
+        console.log(aa);
       }
       return { previousTodos };
     },
@@ -155,32 +112,12 @@ const TasksController = ({ tasks, status, isNewTaskInputVisible, todoID, setNewT
     if (task.id === "1") return;
     doDeleteTask.mutate(task);
   };
-  const createTask = async () => {
-    const newTask = getValues("newTask");
-    if (!newTask) return;
-    doCreateTask.mutate(newTask);
-  };
-
-  const onBlurNewTask = () => {
-    createTask();
-    setNewTaskInputFalse();
-  };
-  const onKeyDownNewTask = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      createTask();
-      setNewTaskInputFalse();
-      return;
-    }
-  };
 
   return (
     <>
       {tasks?.map((task) => (
         <Task task={task} key={task.id} deleteTask={deleteTask} updateTask={updateTask} />
       ))}
-      {isNewTaskInputVisible ? (
-        <NewTaskController control={control} onBlur={onBlurNewTask} onKeyDown={onKeyDownNewTask} />
-      ) : null}
     </>
   );
 };
