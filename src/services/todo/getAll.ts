@@ -2,29 +2,30 @@ import { prisma } from "@/libs/prisma";
 import { KanbanStatus } from "@/utils/types/Kanban";
 import { Task } from "@/utils/types/Task";
 
-export type singleTodoType = {
+type dataType = {
   id: string;
   status: KanbanStatus;
   title: string;
+  updatedAt: Date;
   tasks: Task[];
-  description: string;
+};
+type getAllProps = {
+  user_Id: string;
 };
 
-type getTodoProps = {
-  id: string;
-};
-
-export default async function getTodo({ id: todo_id }: getTodoProps): Promise<singleTodoType> {
-  return (await prisma.to_do.findUnique({
+export default async function getAll({ user_Id }: getAllProps): Promise<dataType[]> {
+  return (await prisma.to_do.findMany({
     where: {
-      id: todo_id,
+      user_Id,
     },
     select: {
       id: true,
-      description: true,
+      description: false,
       status: true,
       title: true,
+      updatedAt: true,
+      createdAt: false,
       tasks: true,
     },
-  })) as unknown as singleTodoType;
+  })) as unknown as dataType[];
 }

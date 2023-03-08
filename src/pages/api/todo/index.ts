@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { separateTodo } from "@/services/todo/separateTodo";
 import { KanbanStatus } from "@/utils/types/Kanban";
 import { Task } from "@/utils/types/Task";
-import getTodo from "@/services/todo/getTodo";
+import getAll from "@/services/todo/getAll";
 import createTodo from "@/services/todo/createTodo";
 import updateTodo from "@/services/todo/updateTodo";
 
@@ -26,7 +26,7 @@ export default async function handlerCreate(req: UserApiRequest, res: NextApiRes
   if (method === "GET") {
     const { user_Id } = req.body;
     try {
-      const query = await getTodo({ user_Id });
+      const query = await getAll({ user_Id });
       const data = separateTodo(query);
       return res.send(data);
     } catch (err) {

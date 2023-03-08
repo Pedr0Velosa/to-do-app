@@ -28,9 +28,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const isAuth = !!user;
 
   const signIn = ({ id, username, email }: userProps) => {
+    const hour = 60 * 60;
     const { token, user } = signInRequest({ id, username, email });
-    setCookie(undefined, "auth.token", token, { httpOnly: true });
-    setCookie(undefined, "userid.token", user.id, { httpOnly: true });
+    setCookie(undefined, "auth.token", token, { maxAge: 1 * hour });
+    setCookie(undefined, "userid.token", user.id, { maxAge: 1 * hour });
 
     setUser(user);
 
