@@ -8,12 +8,18 @@ import List from "@mui/material/List";
 import { Todo } from "@/utils/types/Todo";
 import { useDrag } from "react-dnd";
 import { ItemType } from "@/utils/ItemType";
-import TasksController from "./Tasks/TasksController";
-import { Box, ButtonBase } from "@mui/material";
+import TasksController from "./Tasks/controller/TasksController";
 import ModalWrapper from "@/components/Modal/ModalWrapper";
 import CardInfo from "./Modals/CardInfo";
 
-import NewTaskController from "./Tasks/NewTaskController";
+import NewTaskController from "./Tasks/controller/NewTaskController";
+import TasksContainer from "./Tasks/TaskContainer";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { METHODS } from "@/utils/Methods";
+import type { Task as TaskType } from "@/utils/types/Task";
+import { separateDataType } from "@/services/todo/separateTodo";
+import CardTitle from "./Title/CardTitle";
 
 type CardProps = {
   todo: Todo;
@@ -26,16 +32,96 @@ const Card = ({ todo }: CardProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemType.CARD,
     item: { id: todo.id, todoStatus: todo.status },
-    end: (item, monitor) => {
-      const dropResult = monitor.getDropResult();
-    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
       handlerId: monitor.getHandlerId(),
     }),
   }));
+  const queryClient = useQueryClient();
 
-  const toogleVisibility = () => setIsNewTaskInputVisible(!isNewTaskInputVisible);
+  const doUpdateTask = useMutation({
+    mutationFn: (task: TaskType) => {
+      return axios("/api/task", {
+        method: METHODS.UPDATE,
+        data: { id: task.id, done: task.done },
+      });
+    },
+    onMutate: async (task) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+
+      const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
+      if (previousTodos) {
+        queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
+          ...old,
+          [todo.status]: old[todo.status].map((todo) => {
+            if (todo.id === task.to_do_Id) {
+              return {
+                ...todo,
+                tasks: todo.tasks.map((t) => {
+                  if (t.id === task.id) {
+                    return { ...t, done: !t.done };
+                  }
+                  return t;
+                }),
+              };
+            }
+            return todo;
+          }),
+        }));
+      }
+      return { previousTodos };
+    },
+    onError: (err, newTask, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+  const doDeleteTask = useMutation({
+    mutationFn: (task: TaskType) => {
+      return axios("/api/task", {
+        method: METHODS.DELETE,
+        data: { id: task.id },
+      });
+    },
+    onMutate: async (task) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+
+      const previousTodos = queryClient.getQueryData<separateDataType>(["todos"]);
+
+      if (previousTodos) {
+        queryClient.setQueryData<unknown>(["todos"], (old: separateDataType) => ({
+          ...old,
+          [todo.status]: old[todo.status].map((todo) => {
+            if (todo.id === task.to_do_Id) {
+              return {
+                ...todo,
+                tasks: todo.tasks?.filter((t) => {
+                  if (t.id === task.id) {
+                    return;
+                  }
+                  return t;
+                }),
+              };
+            }
+            return todo;
+          }),
+        }));
+      }
+      return { previousTodos };
+    },
+    onError: (err, newTask, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData<separateDataType>(["todos"], context.previousTodos);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
 
   const setNewTaskInputFalse = () => setIsNewTaskInputVisible(false);
 
@@ -43,41 +129,30 @@ const Card = ({ todo }: CardProps) => {
   const closeModal = () => setIsOpenModal(false);
 
   const opacity = isDragging ? 0.5 : 1;
+
   return (
     <>
       <ModalWrapper isOpen={isOpenModal} open={openModal} close={closeModal}>
         <CardInfo id={todo.id} />
       </ModalWrapper>
-      <MuiCard id={todo.id} ref={drag} sx={{ opacity }}>
+      <MuiCard id={todo.id} ref={drag} sx={{ opacity, flexShrink: 0 }}>
         <CardContent>
-          <Box>
-            <ButtonBase
-              sx={{
-                display: "block",
-                textAlign: "start",
-                width: "100%",
-                "&:hover": { background: "none", textDecoration: "underline" },
-              }}
-              onClick={openModal}
-            >
-              <Typography component="h1" variant="h6">
-                {todo.title}
-              </Typography>
-            </ButtonBase>
-          </Box>
+          <CardTitle openModal={openModal} title={todo.title} />
         </CardContent>
-        <CardActions>
-          <Button size="small" onClick={toogleVisibility}>
-            add task
-          </Button>
-        </CardActions>
         <CardContent sx={{ py: 0 }}>
-          <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }} disablePadding>
-            <TasksController tasks={todo.tasks} status={todo.status} />
-            {isNewTaskInputVisible ? (
-              <NewTaskController todoprops={todo} setNewTaskInputFalse={setNewTaskInputFalse} />
-            ) : null}
-          </List>
+          <TasksContainer setIsVisile={setIsNewTaskInputVisible}>
+            <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }} disablePadding>
+              <TasksController
+                tasks={todo.tasks}
+                status={todo.status}
+                doUpdateTask={doUpdateTask}
+                doDeleteTask={doDeleteTask}
+              />
+              {isNewTaskInputVisible ? (
+                <NewTaskController todoprops={todo} setIsVisible={setNewTaskInputFalse} />
+              ) : null}
+            </List>
+          </TasksContainer>
         </CardContent>
       </MuiCard>
     </>

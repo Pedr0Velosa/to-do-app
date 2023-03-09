@@ -26,6 +26,7 @@ const Main = () => {
         gridTemplateColumns: "repeat(3,1fr)",
         gap: 2,
         overflowX: "auto",
+        overflowY: "hidden",
         mt: 8,
       }}
     >

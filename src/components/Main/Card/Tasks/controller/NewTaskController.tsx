@@ -2,7 +2,7 @@ import React from "react";
 import OutlinedInput from "@components/Input/OutlinedInput";
 import { Control, Controller, useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { newTask } from "../Card";
+import { newTask } from "../../Card";
 import { METHODS } from "@/utils/Methods";
 import axios from "axios";
 import { dataType, separateDataType } from "@/services/todo/separateTodo";
@@ -11,11 +11,11 @@ import { singleTodoType } from "@/services/todo/getTodo";
 
 type NewTaskControllerProps = {
   todoprops: Todo | singleTodoType;
-  setNewTaskInputFalse: () => void;
+  setIsVisible: (bool: boolean) => void;
   id?: string;
 };
 
-const NewTaskController = ({ setNewTaskInputFalse, todoprops, id }: NewTaskControllerProps) => {
+const NewTaskController = ({ setIsVisible, todoprops, id }: NewTaskControllerProps) => {
   const queryClient = useQueryClient();
 
   const {
@@ -59,7 +59,6 @@ const NewTaskController = ({ setNewTaskInputFalse, todoprops, id }: NewTaskContr
     }
     return previousTodos;
   };
-
   const doCreateTask = useMutation({
     mutationFn: async (newTask: string) => {
       return await axios("/api/task", {
@@ -88,7 +87,7 @@ const NewTaskController = ({ setNewTaskInputFalse, todoprops, id }: NewTaskContr
     if (!newTask) return;
     doCreateTask.mutate(newTask);
   };
-
+  const setNewTaskInputFalse = () => setIsVisible(false);
   const onBlurNewTask = () => {
     createTask();
     setNewTaskInputFalse();
@@ -102,6 +101,7 @@ const NewTaskController = ({ setNewTaskInputFalse, todoprops, id }: NewTaskContr
   };
 
   const rest = { onBlur: onBlurNewTask, onKeyDown: onKeyDownNewTask, autoFocus: true };
+
   return (
     <>
       <Controller

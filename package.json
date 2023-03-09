@@ -17,7 +17,8 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.8",
-    "@mui/styled-engine-sc": "^5.11.0",
+    "@mui/styled-engine-sc": "^5.11.11",
+    "@mui/system": "^5.11.12",
     "@next/font": "13.1.6",
     "@prisma/client": "^4.10.0",
     "@tanstack/react-query": "^4.24.10",
@@ -39,7 +40,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.1",
     "react-toastify": "^9.1.1",
-    "styled-components": "^5.3.6",
+    "styled-components": "^5.3.8",
     "swr": "^2.0.3",
     "typescript": "4.9.5",
     "uuid": "^9.0.0"

@@ -2,10 +2,10 @@ import Main from "@/components/Main/Main";
 import Header from "@/components/Header/Header";
 import NewItemController from "@/components/NewItem/Controller";
 import getUser from "@/services/user/getUser";
-import { Container } from "@mui/system";
 import { NextPage, GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { parseCookies } from "nookies";
+import { Container } from "@mui/material";
 
 const HomePage: NextPage = ({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
@@ -17,7 +17,7 @@ const HomePage: NextPage = ({ data }: InferGetServerSidePropsType<typeof getServ
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header username={data.username} />
-      <Container sx={{ display: "grid", gridTemplateRows: "auto 1fr" }}>
+      <Container sx={{ display: "grid", gridTemplateRows: "auto 1fr", overflow: "hidden" }} component={"section"}>
         <NewItemController />
         <Main />
       </Container>

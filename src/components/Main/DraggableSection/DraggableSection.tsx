@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Stack } from "@mui/material";
 import Card from "../Card/Card";
 import { KanbanStatus } from "@/utils/types/Kanban";
 import { Todo } from "@/utils/types/Todo";
@@ -9,11 +9,21 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { separateDataType } from "@/services/todo/separateTodo";
 import axios from "axios";
 import { METHODS } from "@/utils/Methods";
+import styled from "@emotion/styled";
 
 type DraggableSectionType = {
   status: KanbanStatus;
   data: any;
 };
+const StyledStack = styled(Stack)({
+  backgroundColor: "ButtonFace",
+  height: "100%",
+  overflow: "auto",
+  padding: 16,
+  minWidth: 300,
+  overflowY: "auto",
+  flex: 1,
+});
 
 const DraggableSection = ({ status, data }: DraggableSectionType) => {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
@@ -30,8 +40,10 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({ id, prevStatus }: { id: string; prevStatus: KanbanStatus }) => {
-      return sendRequest(id);
+    mutationFn: async ({ id, prevStatus }: { id: string; prevStatus: KanbanStatus }) => {
+      return await axios("/api/todo", { method: METHODS.UPDATE, params: { id, status } }).then(
+        (response) => response.data
+      );
     },
     onMutate: async ({ id: todoID, prevStatus }) => {
       await queryClient.cancelQueries({ queryKey: ["todos"] });
@@ -61,27 +73,10 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
     },
   });
 
-  const sendRequest = async (id: string) => {
-    return await axios("/api/todo", { method: METHODS.UPDATE, params: { id, status } }).then(
-      (response) => response.data
-    );
-  };
-
   const opacity = canDrop && isOver ? 0.5 : 1;
+
   return (
-    <Box
-      ref={drop}
-      sx={{
-        bgcolor: "ButtonFace",
-        height: "100%",
-        overflow: "auto",
-        p: 2,
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        opacity,
-      }}
-    >
+    <StyledStack ref={drop} gap={2} sx={{ opacity }}>
       {!data ? (
         <>Loading...</>
       ) : (
@@ -89,7 +84,7 @@ const DraggableSection = ({ status, data }: DraggableSectionType) => {
           .filter((todo: Todo) => todo.status === status)
           .map((filteredTodo: Todo) => <Card todo={filteredTodo} key={filteredTodo.id} />)
       )}
-    </Box>
+    </StyledStack>
   );
 };
 
