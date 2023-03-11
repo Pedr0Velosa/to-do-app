@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { singleTodoType } from "@/services/todo/getTodo";
-import { Divider, SelectChangeEvent, Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import TasksController from "../Tasks/controller/TasksController";
 import NewTaskController from "../Tasks/controller/NewTaskController";
@@ -14,8 +14,14 @@ import Title from "./Title/Title";
 import { METHODS } from "@/utils/Methods";
 import type { Task as TaskType } from "@/utils/types/Task";
 import { dataType } from "@/services/todo/separateTodo";
+import ModalWrapper from "@/components/Modal/ModalWrapper";
 
-type CardInfoProps = { id: string };
+type CardInfoProps = {
+  id: string;
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+};
 
 export type useFormType = {
   title: string;
@@ -23,7 +29,7 @@ export type useFormType = {
   status: KanbanStatus | "";
 };
 
-const CardInfo = ({ id }: CardInfoProps) => {
+const CardInfo = ({ id, isOpen, open, close }: CardInfoProps) => {
   const [isNewTaskInputVisible, setIsNewTaskInputVisible] = useState<boolean>(false);
   const { data, isLoading } = useQuery<singleTodoType>({
     queryKey: ["todos", id],
@@ -110,24 +116,30 @@ const CardInfo = ({ id }: CardInfoProps) => {
   if (isLoading || !data) return <>Loading...</>;
 
   return (
-    <Stack gap={2}>
-      <Controller name="title" control={control} render={({ field }) => <Title field={field} setValue={setValue} />} />
-      <Status status={watch("status")} setStatus={setValue} />
-      <Divider />
-      <Controller name="description" control={control} render={({ field }) => <Description field={field} />} />
-      <Divider />
-      <TasksContainer setIsVisile={setIsNewTaskInputVisible} size="medium">
-        <TasksController
-          tasks={data.tasks}
-          status={data.status}
-          doUpdateTask={doUpdateTask}
-          doDeleteTask={doDeleteTask}
+    <ModalWrapper isOpen={isOpen} open={open} close={close}>
+      <Stack gap={2}>
+        <Controller
+          name="title"
+          control={control}
+          render={({ field }) => <Title field={field} setValue={setValue} />}
         />
-        {isNewTaskInputVisible ? (
-          <NewTaskController todoprops={data} setIsVisible={setIsNewTaskInputVisible} id={data.id} />
-        ) : null}
-      </TasksContainer>
-    </Stack>
+        <Status status={watch("status")} setStatus={setValue} />
+        <Divider />
+        <Controller name="description" control={control} render={({ field }) => <Description field={field} />} />
+        <Divider />
+        <TasksContainer setIsVisile={setIsNewTaskInputVisible} size="medium">
+          <TasksController
+            tasks={data.tasks}
+            status={data.status}
+            doUpdateTask={doUpdateTask}
+            doDeleteTask={doDeleteTask}
+          />
+          {isNewTaskInputVisible ? (
+            <NewTaskController todoprops={data} setIsVisible={setIsNewTaskInputVisible} id={data.id} />
+          ) : null}
+        </TasksContainer>
+      </Stack>
+    </ModalWrapper>
   );
 };
 

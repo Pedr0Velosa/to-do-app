@@ -10,7 +10,7 @@ import { useDrag } from "react-dnd";
 import { ItemType } from "@/utils/ItemType";
 import TasksController from "./Tasks/controller/TasksController";
 import ModalWrapper from "@/components/Modal/ModalWrapper";
-import CardInfo from "./Modals/CardInfo";
+import CardInfo from "./CardModal/CardInfo";
 
 import NewTaskController from "./Tasks/controller/NewTaskController";
 import TasksContainer from "./Tasks/TaskContainer";
@@ -132,9 +132,7 @@ const Card = ({ todo }: CardProps) => {
 
   return (
     <>
-      <ModalWrapper isOpen={isOpenModal} open={openModal} close={closeModal}>
-        <CardInfo id={todo.id} />
-      </ModalWrapper>
+      <CardInfo id={todo.id} close={closeModal} isOpen={isOpenModal} open={openModal} />
       <MuiCard id={todo.id} ref={drag} sx={{ opacity, flexShrink: 0 }}>
         <CardContent>
           <CardTitle openModal={openModal} title={todo.title} />

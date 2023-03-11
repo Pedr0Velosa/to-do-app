@@ -59,6 +59,11 @@ const NewTaskController = ({ setIsVisible, todoprops, id }: NewTaskControllerPro
     }
     return previousTodos;
   };
+  const createTask = async () => {
+    const newTask = getValues("newTask");
+    if (!newTask) return;
+    doCreateTask.mutate(newTask);
+  };
   const doCreateTask = useMutation({
     mutationFn: async (newTask: string) => {
       return await axios("/api/task", {
@@ -82,11 +87,7 @@ const NewTaskController = ({ setIsVisible, todoprops, id }: NewTaskControllerPro
       return queryClient.invalidateQueries({ queryKey: ["todos", id] });
     },
   });
-  const createTask = async () => {
-    const newTask = getValues("newTask");
-    if (!newTask) return;
-    doCreateTask.mutate(newTask);
-  };
+
   const setNewTaskInputFalse = () => setIsVisible(false);
   const onBlurNewTask = () => {
     createTask();
