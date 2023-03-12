@@ -34,76 +34,17 @@ const CardInfo = ({ id, isOpen, open, close }: CardInfoProps) => {
   const { data, isLoading } = useQuery<singleTodoType>({
     queryKey: ["todos", id],
     queryFn: () => axios(`/api/todo/${id}`).then((res) => res.data),
+    refetchOnWindowFocus: false,
   });
   const { control, setValue, reset, watch } = useForm<useFormType>({
     defaultValues: { title: "", description: "", status: "" },
   });
   const queryClient = useQueryClient();
 
-  const doUpdateTask = useMutation({
-    mutationFn: (task: TaskType) => {
-      return axios(`/api/task/`, {
-        method: METHODS.UPDATE,
-        data: { id: task.id, done: task.done },
-      });
-    },
-    onMutate: async (task) => {
-      await queryClient.cancelQueries({ queryKey: ["todos", id] });
-
-      const previousTodos = queryClient.getQueryData<dataType>(["todos", id]);
-      if (previousTodos) {
-        queryClient.setQueryData<unknown>(["todos", id], (old: dataType) => ({
-          ...old,
-          tasks: old.tasks.map((t) => {
-            if (t.id !== task.id) return t;
-            return { ...t, done: !t.done };
-          }),
-        }));
-      }
-      return { previousTodos };
-    },
-    onError: (err, newTask, context) => {
-      if (context?.previousTodos) {
-        queryClient.setQueryData<dataType>(["todos", id], context.previousTodos);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos", id] });
-    },
-  });
-  const doDeleteTask = useMutation({
-    mutationFn: (task: TaskType) => {
-      return axios(`/api/task/`, {
-        method: METHODS.DELETE,
-        data: { id: task.id },
-      });
-    },
-    onMutate: async (task) => {
-      await queryClient.cancelQueries({ queryKey: ["todos", id] });
-
-      const previousTodos = queryClient.getQueryData<dataType>(["todos", id]);
-      if (previousTodos) {
-        queryClient.setQueryData<unknown>(["todos", id], (old: dataType) => ({
-          ...old,
-          tasks: old.tasks.filter((t) => {
-            if (t.id === task.id) {
-              return;
-            }
-            return t;
-          }),
-        }));
-      }
-      return { previousTodos };
-    },
-    onError: (err, newTask, context) => {
-      if (context?.previousTodos) {
-        queryClient.setQueryData<dataType>(["todos", id], context.previousTodos);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos", id] });
-    },
-  });
+  useEffect(() => {
+    if (!isOpen) return;
+    queryClient.invalidateQueries({ queryKey: ["todos", id] });
+  }, [id, isOpen, queryClient]);
 
   useEffect(() => {
     if (!data) return;
@@ -128,12 +69,7 @@ const CardInfo = ({ id, isOpen, open, close }: CardInfoProps) => {
         <Controller name="description" control={control} render={({ field }) => <Description field={field} />} />
         <Divider />
         <TasksContainer setIsVisile={setIsNewTaskInputVisible} size="medium">
-          <TasksController
-            tasks={data.tasks}
-            status={data.status}
-            doUpdateTask={doUpdateTask}
-            doDeleteTask={doDeleteTask}
-          />
+          <TasksController tasks={data.tasks} status={data.status} id={data.id} />
           {isNewTaskInputVisible ? (
             <NewTaskController todoprops={data} setIsVisible={setIsNewTaskInputVisible} id={data.id} />
           ) : null}
